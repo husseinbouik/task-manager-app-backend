@@ -1,7 +1,3 @@
-Here’s the **README.md** file for the **Laravel Task Management API** repository.  
-
----
-
 # **Laravel Task Management API**  
 
 ## **📌 Overview**  
@@ -211,5 +207,3 @@ This project is licensed under the **MIT License**.
 
 ## **🎯 Final Notes**
 This API is **ready for frontend integration**! 🚀🔥  
-
-Let me know if you need any modifications! 💯
