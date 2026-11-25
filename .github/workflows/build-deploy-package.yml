@@ -22,7 +22,16 @@ jobs:
           tools: composer:v2
 
       - name: Install production dependencies
-        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-progress
+        # --no-scripts: composer's post-autoload-dump would boot the app and
+        # fail, because config/scribe.php references the dev-only Scribe
+        # package. Package discovery is run separately below, after that
+        # config file is removed from this throwaway CI checkout.
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Drop dev-only Scribe config and discover packages
+        run: |
+          rm -f config/scribe.php
+          php artisan package:discover --ansi
 
       - name: Assemble the deployable folder
         run: |
