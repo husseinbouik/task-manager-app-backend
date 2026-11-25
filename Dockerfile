@@ -20,7 +20,7 @@ RUN composer install --no-dev --no-interaction --no-progress --optimize-autoload
 # App code
 COPY . .
 
-RUN composer dump-autoload --optimize \
+RUN composer dump-autoload --optimize --no-scripts \
     && sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
     && mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache database \
     && chown -R www-data:www-data storage bootstrap/cache database
