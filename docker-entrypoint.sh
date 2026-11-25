@@ -13,6 +13,7 @@ fi
 # Laravel reads configuration from environment variables on Render;
 # make sure no stale cached config survives from the image build.
 php artisan config:clear >/dev/null 2>&1 || true
+php artisan package:discover --ansi
 
 php artisan migrate --force
 # Seeder is idempotent (firstOrCreate), so it is safe on every boot;
