@@ -18,7 +18,10 @@ return [
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
-    'allowed_origins' => ['http://localhost:3000'],
+    'allowed_origins' => array_values(array_unique(array_filter([
+        'http://localhost:3000',
+        env('FRONTEND_URL'),
+    ]))),
     'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],
     'exposed_headers' => [],
