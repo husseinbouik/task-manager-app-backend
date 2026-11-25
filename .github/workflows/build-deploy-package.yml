@@ -1,0 +1,58 @@
+name: Build alwaysdata deploy package
+
+# Builds a production backend bundle (app + vendor, no dev deps) for
+# upload to shared hosting (alwaysdata free plan). The bundle deliberately
+# contains NO .env — the production .env is injected into the zip after
+# download, so no secret ever lands in this repo or in CI logs.
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_sqlite, sqlite3, bcmath, zip, intl, dom, xml
+          tools: composer:v2
+
+      - name: Install production dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-progress
+
+      - name: Assemble the deployable folder
+        run: |
+          mkdir -p staging/taskmanager
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='tests' \
+            --exclude='Dockerfile' \
+            --exclude='docker-entrypoint.sh' \
+            --exclude='render.yaml' \
+            --exclude='image.png' \
+            ./ staging/taskmanager/
+          # Make sure the writable skeleton dirs survive the copy
+          mkdir -p staging/taskmanager/storage/framework/cache/data \
+                   staging/taskmanager/storage/framework/sessions \
+                   staging/taskmanager/storage/framework/views \
+                   staging/taskmanager/storage/logs \
+                   staging/taskmanager/bootstrap/cache
+          du -sh staging/taskmanager
+          du -sh staging/taskmanager/vendor
+          cd staging && zip -r -q ../task-manager-backend-ci.zip taskmanager
+          ls -lh ../task-manager-backend-ci.zip
+
+      - name: Upload the package as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: task-manager-backend-alwaysdata
+          path: task-manager-backend-ci.zip
+          retention-days: 7
