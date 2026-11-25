@@ -1,0 +1,36 @@
+# Render Blueprint — Task Manager API (free Docker web service)
+# Deploy: Render Dashboard -> New -> Blueprint -> connect this repo -> Apply.
+# APP_KEY is intentionally NOT stored here: when prompted (sync: false),
+# paste the APP_KEY supplied separately. APP_URL / FRONTEND_URL assume the
+# service names below; if Render assigns different hostnames, update those
+# two values in the dashboard (no code change needed).
+services:
+  - type: web
+    name: task-manager-api
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /up
+    envVars:
+      - key: APP_NAME
+        value: TaskManager
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        sync: false
+      - key: APP_URL
+        value: https://task-manager-api.onrender.com
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /var/www/html/database/database.sqlite
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_STORE
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: FRONTEND_URL
+        value: https://task-manager-web.onrender.com
